@@ -2,6 +2,10 @@
 import os
 import sys
 
+
+# 1313213这是是注释
+
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'luffy.settings')
     try:
