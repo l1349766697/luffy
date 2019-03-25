@@ -10,13 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os
+import os,sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # 表示项目的根目录
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
+# 把apps目录设置环境变量中的导包路径
+sys.path.append( os.path.join(BASE_DIR,"luffy/apps") )
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -26,8 +26,23 @@ SECRET_KEY = 'w*v$w&s7g(602=7cq+i6-%2uf@n1g5k3vq!g1&x14m=5(dlau4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# 设置哪些客户端可以通过地址访问到后端
+ALLOWED_HOSTS = [
+    'api.luffycity.cn',
+    'www.luffycity.cn',
+    'localhost',  # 实际开发的时候不会写上localhost和127.0.0.1的
+    '127.0.0.1',
+]
 
+# cors-header的配置信息，设置允许前端访问drf
+# CORS组的配置信息
+CORS_ORIGIN_WHITELIST = (
+    '127.0.0.1:8080',
+    'localhost:8080',
+    'www.luffycity.cn:8080'
+)
+
+CORS_ALLOW_CREDENTIALS = True  # 允许ajax跨域请求时携带cookie
 
 # Application definition
 
@@ -38,9 +53,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'rest_framework',
+    'xadmin',
+    'crispy_forms',
+    'reversion',
+    'home',
 ]
 
+
 MIDDLEWARE = [
+    # 解决前端跨域问题的 cors组件
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -108,9 +132,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -122,8 +146,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+# 访问静态文件的url地址前缀
 STATIC_URL = '/static/'
+# 项目中存储上传文件的根目录[暂时配置]，注意，static目录需要手动创建否则上传文件时报错
+MEDIA_ROOT=os.path.join(BASE_DIR,"luffy/static")
 
+# 设置django的静态文件目录
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR,"luffy/static")
+]
 
 # 日志配置
 LOGGING = {
@@ -177,7 +208,6 @@ LOGGING = {
 
 # drf框架的配置信息
 REST_FRAMEWORK = {
-
     # 异常处理
     'EXCEPTION_HANDLER': 'luffy.utils.exceptions.custom_exception_handler',
 }
